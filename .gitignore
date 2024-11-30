@@ -1,0 +1,4 @@
+emotion_visualizer/
+__pycache__/
+*.pyc
+.env
