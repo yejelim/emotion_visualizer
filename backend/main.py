@@ -13,17 +13,20 @@ class TextInput(BaseModel):
 
 @app.post("/text-to-image")
 async def text_to_image_endpoint(text_input: TextInput):
-    # Process the text input and generate an image (placeholder logic)
-    text_embeddings = text_to_image_embeddings(text_input.text)
-    # Implement your custom logic here
-    return {"message": "Image generated based on text."}
+    image = generate_image_from_text(text_input.text)
+    # Save or process the image as needed
+    # For example, convert to bytes and return
+    buf = io.BytesIO()
+    image.save(buf, format='PNG')
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="image/png")
 
 @app.post("/image-to-text")
 async def image_to_text_endpoint(file: UploadFile = File(...)):
     image = Image.open(io.BytesIO(await file.read()))
-    image_embeddings = image_to_text_embeddings(image)
-    # Implement your custom logic here
-    return {"message": "Text generated based on image."}
+    caption = generate_text_from_image(image)
+    return {"description": caption}
+
 
 @app.get("/health")
 async def health_check():

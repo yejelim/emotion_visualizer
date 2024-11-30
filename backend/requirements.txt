@@ -4,3 +4,5 @@ transformers
 torch
 Pillow
 python-dotenv
+diffusers
+transformers[image]
