@@ -1,8 +1,9 @@
 # backend/main.py
 
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import StreamingResponse, PlainTextResponse
 from pydantic import BaseModel
-from utils import text_to_image_embeddings, image_to_text_embeddings
+from utils import generate_image_from_text, generate_text_from_image
 from PIL import Image
 import io
 
@@ -23,9 +24,14 @@ async def text_to_image_endpoint(text_input: TextInput):
 
 @app.post("/image-to-text")
 async def image_to_text_endpoint(file: UploadFile = File(...)):
-    image = Image.open(io.BytesIO(await file.read()))
+    try:
+        image = Image.open(io.BytesIO(await file.read())).convert("RGB")
+    except Exception as e:
+        return PlainTextResponse(f"Error processing image: {str(e)}", status_code=400)
+        
     caption = generate_text_from_image(image)
-    return {"description": caption}
+    # Return the caption as plain text
+    return PlainTextResponse(caption)
 
 
 @app.get("/health")

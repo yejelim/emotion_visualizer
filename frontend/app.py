@@ -14,12 +14,19 @@ option = st.selectbox(
 if option == "Text to Image":
     text_input = st.text_input("Enter your emotion:", key='text_input_enter')
     if st.button("Visualize Emotion", key='visualize_button'):
-        response = requests.post(
-            "http://localhost:8000/text-to-image",
-            json={"text": text_input}
-        )
-        # Display the image (placeholder)
-        st.image("path/to/generated/image.png")
+        if text_input.strip() == "":
+            st.warning("Please enter an emotion.")
+        else:
+            response = requests.post(
+                "http://localhost:8000/text-to-image",
+                json={"text": text_input}
+            )
+            if response.status_code == 200:
+                # Display the image (placeholder)
+                st.image(response.content, use_container_width=True)
+            else:
+                st.error("Failed to generate image.")
+                
 elif option == "Image to Text":
     uploaded_file = st.file_uploader("Upload an image:", type=["png", "jpg", "jpeg"])
     if uploaded_file is not None:
@@ -30,4 +37,4 @@ elif option == "Image to Text":
                 files=files
             )
             # Display the text analysis
-            st.write(response.json()["message"])
+            st.write(response.text)

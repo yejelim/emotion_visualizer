@@ -20,6 +20,9 @@ def generate_image_from_text(text):
     return image
 
 def generate_text_from_image(image):
+    # Ensure the image is in RGB mode
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
     pixel_values = image_processor(images=image, return_tensors="pt").pixel_values
     output_ids = caption_model.generate(pixel_values)
     caption = tokenizer.decode(output_ids[0], skip_special_tokens=True)
